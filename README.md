@@ -3,11 +3,17 @@
 
 ## deps:
 
-# python-whois
+### python-whois
 
 https://github.com/richardpenman/whois
 
     $ pip install python-whois
+
+### NLTK
+
+http://nltk.org
+
+    $ pip install nltk
 
 ## Использование
 Поиск URL в реестре фишинговых доменов. Возвращает True, если домен обнаружен в реестре.
