@@ -1,6 +1,14 @@
 # fish
 Поиск фишинговых сайтов по домену -- **ВАРИАНТ 2**
 
+## deps:
+
+# python-whois
+
+https://github.com/richardpenman/whois
+
+    $ pip install python-whois
+
 ## Использование
 Поиск URL в реестре фишинговых доменов. Возвращает True, если домен обнаружен в реестре.
 
