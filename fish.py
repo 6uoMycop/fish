@@ -142,7 +142,7 @@ def generate_domain_name(keywords: list, toplevel: str = '.com', delim: str = '-
     # pass  # TODO return ALL, sorted, with eval numbers
     return [x for _, x in sorted(zip(combinations_values, domain_names))], sorted(combinations_values)
 
-
+# refresh_db()
 # check_owner('google.com')
 # random.seed(time.process_time())
 # print(generate('google.com', 100))
@@ -150,4 +150,3 @@ def generate_domain_name(keywords: list, toplevel: str = '.com', delim: str = '-
 names, values = generate_domain_name(['signal', 'quest'])
 for i in range(len(names)):
     print("{:.2f}".format(values[i]) + " | " + str(names[i]))
-
