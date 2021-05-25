@@ -1,8 +1,10 @@
+import itertools
 import tarfile
 import requests
 import random
-import time
+# import time
 import whois
+from nltk.corpus import wordnet
 
 
 def refresh_db():
@@ -74,3 +76,78 @@ def check_owner(url_in: str):
         print('Organisation\'s name unspecified. Unreliable domain')
     else:
         print('Organisation name: ' + org)
+
+
+def is_available(url_in: str):
+    try:
+        whois.whois(url=url_in)
+    except:
+        return True
+    return False
+
+
+def analyze_word(word: str):
+    n = 0  # number of ambiguous letters
+    for c in word:
+        if c in symbols.keys():
+            n += 1
+    return n / len(word)  # relative number of ambiguous letters
+
+
+# generate phishing-safe domain name by keyword
+# returns [list of lists of domain names], [list of evaluated numbers (less=better)], [list of listd of availability]
+def generate_domain_name(keywords: list, toplevel: str = '.com', delim: str = '-'):
+    domain_names = []
+    synonyms = []
+    synonyms_values = []  # evaluation values for corresponding words in synonyms list
+    for kw in keywords:
+        # generate synonyms
+        synonims_i = [kw]
+        for syn in wordnet.synsets(kw):
+            for l in syn.lemmas():
+                if l.name().isalpha():
+                    synonims_i.append(l.name().lower())
+        synonyms.append(list(set(synonims_i)))
+
+        # eval
+        values_i = []
+        for w in synonims_i:
+            values_i.append(analyze_word(w))
+        synonyms_values.append(values_i)
+
+    combinations = list(itertools.product(*synonyms))
+    combinations_values = []
+    permutations = []
+
+    for elem in combinations:
+        permutations.append(list(itertools.permutations(list(elem))))
+
+        val = 0
+        for i in range(len(elem)):
+            val += synonyms_values[i][synonyms[i].index(elem[i])]
+        combinations_values.append(val)
+
+    for block in permutations:
+        domain_names_i = []
+        for elem in block:
+            name = ''
+            for word in elem:
+                name += word
+                name += delim
+            name = name[:-len(delim)] if delim else name
+            name += toplevel
+            domain_names_i.append((name, is_available(name)))
+        domain_names.append(domain_names_i)
+
+    # pass  # TODO return ALL, sorted, with eval numbers
+    return [x for _, x in sorted(zip(combinations_values, domain_names))], sorted(combinations_values)
+
+
+# check_owner('google.com')
+# random.seed(time.process_time())
+# print(generate('google.com', 100))
+
+names, values = generate_domain_name(['signal', 'quest'])
+for i in range(len(names)):
+    print("{:.2f}".format(values[i]) + " | " + str(names[i]))
+
